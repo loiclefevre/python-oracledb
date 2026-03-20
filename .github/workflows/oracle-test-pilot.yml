@@ -1,4 +1,3 @@
-# CI
 name: Build on Oracle Test Pilot
 
 on:
@@ -43,7 +42,7 @@ jobs:
         with:
           oci-service: ${{ matrix.rdbms }}
           action: create
-          user: pythontest_${{ matrix.python-version }}
+          user: pythontest_${{ matrix.python-version }},admin_${{ matrix.python-version }},pythontestproxy_${{ matrix.python-version }}
 
 #      - name: Install Oracle Instant Client
 #        run: |
@@ -62,11 +61,11 @@ jobs:
           PYO_TEST_MAIN_USER: pythontest_${{ matrix.python-version }}_${{ github.run_number }}
           PYO_TEST_MAIN_PASSWORD: ${{ steps.create_database.outputs.database_password }}
           # TODO: check if can be removed?
-          PYO_TEST_PROXY_USER: pythontestproxy
+          PYO_TEST_PROXY_USER: pythontestproxy_${{ matrix.python-version }}_${{ github.run_number }}
           PYO_TEST_PROXY_PASSWORD: ${{ secrets.DPY_ORACLE_PASSWORD }}
-          PYO_TEST_ADMIN_USER: system
-          PYO_TEST_ADMIN_PASSWORD: ${{ secrets.DPY_ORACLE_PASSWORD }}
-          PYO_TEST_EDITION_NAME: pythoneditions
+          PYO_TEST_ADMIN_USER: admin_${{ matrix.python-version }}_${{ github.run_number }}
+          PYO_TEST_ADMIN_PASSWORD: ${{ steps.create_database.outputs.database_password }}
+          PYO_TEST_EDITION_NAME: pythoneditions_${{ matrix.python-version }}_${{ github.run_number }}
           LD_LIBRARY_PATH: ${{ env.LD_LIBRARY_PATH }}:${{ env.OIC_DIR }}
         run: |
           python -m pytest tests/create_schema.py
