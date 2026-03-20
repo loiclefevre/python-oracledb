@@ -59,7 +59,7 @@ jobs:
       - name: Run tests
         env:
           PYO_TEST_CONNECT_STRING: ${{ steps.create_database.outputs.connection_string_suffix }}
-          PYO_TEST_MAIN_USER: "pythontest_${{ matrix.python-version }}_${{ github.run_number }}"
+          PYO_TEST_MAIN_USER: pythontest_${{ matrix.python-version }}_${{ github.run_number }}
           PYO_TEST_MAIN_PASSWORD: ${{ steps.create_database.outputs.database_password }}
           # TODO: check if can be removed?
           PYO_TEST_PROXY_USER: pythontestproxy
