@@ -22,10 +22,8 @@ jobs:
     strategy:
       fail-fast: true # TODO: check if false instead?
       matrix:
-        include:
-          - rdbms: base-database-service-26ai
-          - rdbms: autonomous-transaction-processing-serverless-26ai
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+        rdbms: ['base-database-service-26ai','autonomous-transaction-processing-serverless-26ai']
     runs-on: [ self-hosted, Linux, X64, OracleTestPilot ]
     steps:
 
