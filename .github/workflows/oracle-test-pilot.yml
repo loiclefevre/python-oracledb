@@ -1,0 +1,85 @@
+name: Build on Oracle Test Pilot
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'otp-integration'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow_ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  dpy_tests-otp:
+    permissions:
+      contents: read
+    name: Build python-oracledb driver
+    #TODO
+    #if: ${{ github.repository_owner == 'oracle' }}
+    strategy:
+      fail-fast: true # TODO: check if false instead?
+      matrix:
+        include:
+          - rdbms: base-database-service-26ai
+          - rdbms: autonomous-transaction-processing-serverless-26ai
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+    runs-on: [ self-hosted, Linux, X64, OracleTestPilot ]
+    steps:
+
+      - name: Check out python-oracledb repository code
+        uses: actions/checkout@v5
+        with:
+          submodules: true
+          persist-credentials: false
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+#      - name: Install Oracle Instant Client
+#        run: |
+#          chmod +x ${{ github.workspace }}/.github/scripts/install_oracle_instantclient.sh
+#          ${{ github.workspace }}/.github/scripts/install_oracle_instantclient.sh
+#          echo "OIC_DIR=$(echo /opt/oracle/instantclient*)" >> $GITHUB_ENV
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[test]"
+
+      - id: create_database
+        uses: oracle-actions/setup-testpilot@896b7a475b58579357f7ad034ff43de53cde4c19 # v1.0.22
+        with:
+          oci-service: ${{ matrix.rdbms }}
+          action: create
+          user: pythontest_${{ matrix.python-version }}
+
+      - name: Run tests
+        env:
+          PYO_TEST_CONNECT_STRING: ${{ steps.create_database.outputs.connection_string_suffix }}
+          PYO_TEST_MAIN_USER: pythontest_${{ matrix.python-version }}_${{ github.run_number }}
+          PYO_TEST_MAIN_PASSWORD: ${{ steps.create_database.outputs.database_password }}
+          # TODO: check if can be removed?
+          PYO_TEST_PROXY_USER: pythontestproxy
+          PYO_TEST_PROXY_PASSWORD: ${{ secrets.DPY_ORACLE_PASSWORD }}
+          PYO_TEST_ADMIN_USER: system
+          PYO_TEST_ADMIN_PASSWORD: ${{ secrets.DPY_ORACLE_PASSWORD }}
+          PYO_TEST_EDITION_NAME: pythoneditions
+          LD_LIBRARY_PATH: ${{ env.LD_LIBRARY_PATH }}:${{ env.OIC_DIR }}
+        run: |
+          python -m pytest tests/create_schema.py
+          python -m pytest
+#          python -m pytest tests/create_schema.py
+#          python -m pytest --use-thick-mode
+
+      - id: delete_database
+        uses: oracle-actions/setup-testpilot@896b7a475b58579357f7ad034ff43de53cde4c19 # v1.0.22
+        if: always()
+        with:
+          oci-service: ${{ matrix.rdbms }}
+          action: delete
+          user: pythontest_${{ matrix.python-version }}
