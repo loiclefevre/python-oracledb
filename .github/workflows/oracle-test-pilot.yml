@@ -59,7 +59,7 @@ jobs:
       - name: Run tests
         env:
           PYO_TEST_CONNECT_STRING: ${{ steps.create_database.outputs.connection_string_suffix }}
-          PYO_TEST_MAIN_USER: pythontest_${{ matrix.python-version }}_${{ github.run_number }}
+          PYO_TEST_MAIN_USER: "pythontest_${{ matrix.python-version }}_${{ github.run_number }}"
           PYO_TEST_MAIN_PASSWORD: ${{ steps.create_database.outputs.database_password }}
           # TODO: check if can be removed?
           PYO_TEST_PROXY_USER: pythontestproxy
@@ -69,7 +69,7 @@ jobs:
           PYO_TEST_EDITION_NAME: pythoneditions
           LD_LIBRARY_PATH: ${{ env.LD_LIBRARY_PATH }}:${{ env.OIC_DIR }}
         run: |
-          python -m pytest tests/create_schema.py
+#          python -m pytest tests/create_schema.py
           python -m pytest
 #          python -m pytest tests/create_schema.py
 #          python -m pytest --use-thick-mode
