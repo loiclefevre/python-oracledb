@@ -44,16 +44,17 @@ jobs:
           action: create
           user: pythontest_${{ matrix.python-version }},admin_${{ matrix.python-version }},pythontestproxy_${{ matrix.python-version }}
 
-      - name: Install Oracle Instant Client
-        run: |
-          chmod +x ${{ github.workspace }}/.github/scripts/install_oracle_instantclient.sh
-          ${{ github.workspace }}/.github/scripts/install_oracle_instantclient.sh
-          echo "OIC_DIR=$(echo /opt/oracle/instantclient*)" >> $GITHUB_ENV
+#      - name: Install Oracle Instant Client
+#        run: |
+#          chmod +x ${{ github.workspace }}/.github/scripts/install_oracle_instantclient.sh
+#          ${{ github.workspace }}/.github/scripts/install_oracle_instantclient.sh
+#          echo "OIC_DIR=$(echo /opt/oracle/instantclient*)" >> $GITHUB_ENV
 
       - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e ".[test]"
+          touch /home/ubuntu/tnsnames.ora
 
       - name: Run tests
         env:
@@ -65,7 +66,8 @@ jobs:
           PYO_TEST_ADMIN_USER: admin_${{ matrix.python-version }}_${{ github.run_number }}
           PYO_TEST_ADMIN_PASSWORD: ${{ steps.create_database.outputs.database_password }}
           PYO_TEST_EDITION_NAME: pythoneditions_${{ matrix.python-version }}_${{ github.run_number }}
-          LD_LIBRARY_PATH: ${{ env.LD_LIBRARY_PATH }}:${{ env.OIC_DIR }}
+          TNS_ADMIN: /home/ubuntu
+          LD_LIBRARY_PATH: ${{ env.LD_LIBRARY_PATH }}:/home/ubuntu
         run: |
           python -m pytest tests/create_schema.py
           python -m pytest
