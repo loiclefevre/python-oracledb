@@ -49,7 +49,7 @@ jobs:
         with:
           oci-service: ${{ matrix.rdbms }}
           action: create
-          user: pythontest_$PY_VERSION_SAFE,admin_$PY_VERSION_SAFE,pythontestproxy_$PY_VERSION_SAFE
+          user: pythontest_${{env.PY_VERSION_SAFE}},admin_${{env.PY_VERSION_SAFE}},pythontestproxy_${{env.PY_VERSION_SAFE}}
 
 #      - name: Install Oracle Instant Client
 #        run: |
@@ -66,13 +66,13 @@ jobs:
       - name: Run tests
         env:
           PYO_TEST_CONNECT_STRING: ${{ steps.create_database.outputs.connection_string_suffix }}
-          PYO_TEST_MAIN_USER: pythontest_$PY_VERSION_SAFE_${{ github.run_number }}
+          PYO_TEST_MAIN_USER: pythontest_${{env.PY_VERSION_SAFE}}_${{ github.run_number }}
           PYO_TEST_MAIN_PASSWORD: ${{ steps.create_database.outputs.database_password }}
-          PYO_TEST_PROXY_USER: pythontestproxy_$PY_VERSION_SAFE_${{ github.run_number }}
+          PYO_TEST_PROXY_USER: pythontestproxy_${{env.PY_VERSION_SAFE}}_${{ github.run_number }}
           PYO_TEST_PROXY_PASSWORD: ${{ steps.create_database.outputs.database_password }}
-          PYO_TEST_ADMIN_USER: admin_$PY_VERSION_SAFE_${{ github.run_number }}
+          PYO_TEST_ADMIN_USER: admin_${{env.PY_VERSION_SAFE}}_${{ github.run_number }}
           PYO_TEST_ADMIN_PASSWORD: ${{ steps.create_database.outputs.database_password }}
-          PYO_TEST_EDITION_NAME: pythoneditions_$PY_VERSION_SAFE_${{ github.run_number }}
+          PYO_TEST_EDITION_NAME: pythoneditions_${{env.PY_VERSION_SAFE}}_${{ github.run_number }}
           TNS_ADMIN: /home/ubuntu
           LD_LIBRARY_PATH: ${{ env.LD_LIBRARY_PATH }}:/home/ubuntu
         run: |
@@ -88,4 +88,4 @@ jobs:
         with:
           oci-service: ${{ matrix.rdbms }}
           action: delete
-          user: pythontest_${{ matrix.python-version }}
+          user: pythontest_${{env.PY_VERSION_SAFE}},admin_${{env.PY_VERSION_SAFE}},pythontestproxy_${{env.PY_VERSION_SAFE}}
