@@ -39,7 +39,8 @@ jobs:
 
       - name: Create safe environment variable
         run: |
-          PY_VERSION_SAFE="${{ matrix.python-version//./_ }}"
+          PY_VERSION=${{matrix.python-version}}
+          PY_VERSION_SAFE=${PY_VERSION//./_}
           echo "PY_VERSION_SAFE=$PY_VERSION_SAFE" >> $GITHUB_ENV
         shell: bash
 
