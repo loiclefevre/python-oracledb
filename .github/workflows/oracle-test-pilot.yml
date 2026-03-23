@@ -75,10 +75,10 @@ jobs:
 #          python -m pytest tests/create_schema.py
 #          python -m pytest --use-thick-mode
 
-      - id: delete_database
-        uses: oracle-actions/setup-testpilot@f620f11f9f26dacfe80ba1823342e3e92604c55f # v1.0.23
-        if: always()
-        with:
-          oci-service: ${{ matrix.rdbms }}
-          action: delete
-          user: pythontest_${{ matrix.python-version }}
+#      - id: delete_database
+#        uses: oracle-actions/setup-testpilot@f620f11f9f26dacfe80ba1823342e3e92604c55f # v1.0.23
+#        if: always()
+#        with:
+#          oci-service: ${{ matrix.rdbms }}
+#          action: delete
+#          user: pythontest_${{ matrix.python-version }}
