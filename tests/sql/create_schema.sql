@@ -49,15 +49,15 @@ grant create session to &proxy_user
 /
 
 grant
-    create session
-    , create table
-    , create procedure
-    , create type
-    , create view
-    --, select any dictionary
-    --, change notification
-    , unlimited tablespace
-    --, ctxapp
+    create session,
+    create table,
+    create procedure,
+    create type,
+    create view,
+    select any dictionary,
+    change notification,
+    unlimited tablespace,
+    ctxapp
 to &main_user
 /
 
