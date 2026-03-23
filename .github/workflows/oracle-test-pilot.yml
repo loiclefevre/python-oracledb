@@ -19,7 +19,7 @@ jobs:
     #TODO
     #if: ${{ github.repository_owner == 'oracle' }}
     strategy:
-      fail-fast: true # TODO: check if false instead?
+      fail-fast: true
       matrix:
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
         rdbms: ['base-database-service-26ai','autonomous-transaction-processing-serverless-26ai']
@@ -37,12 +37,18 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Create safe environment variable
+        run: |
+          PY_VERSION_SAFE="${{ matrix.python-version//./_ }}"
+          echo "PY_VERSION_SAFE=$PY_VERSION_SAFE" >> $GITHUB_ENV
+        shell: bash
+
       - id: create_database
         uses: oracle-actions/setup-testpilot@f620f11f9f26dacfe80ba1823342e3e92604c55f # v1.0.23
         with:
           oci-service: ${{ matrix.rdbms }}
           action: create
-          user: pythontest_${{ matrix.python-version }},admin_${{ matrix.python-version }},pythontestproxy_${{ matrix.python-version }}
+          user: pythontest_$PY_VERSION_SAFE,admin_$PY_VERSION_SAFE,pythontestproxy_$PY_VERSION_SAFE
 
 #      - name: Install Oracle Instant Client
 #        run: |
@@ -59,20 +65,17 @@ jobs:
       - name: Run tests
         env:
           PYO_TEST_CONNECT_STRING: ${{ steps.create_database.outputs.connection_string_suffix }}
-          PYO_TEST_MAIN_USER: pythontest_${{ matrix.python-version }}_${{ github.run_number }}
+          PYO_TEST_MAIN_USER: pythontest_$PY_VERSION_SAFE_${{ github.run_number }}
           PYO_TEST_MAIN_PASSWORD: ${{ steps.create_database.outputs.database_password }}
-          PYO_TEST_PROXY_USER: pythontestproxy_${{ matrix.python-version }}_${{ github.run_number }}
+          PYO_TEST_PROXY_USER: pythontestproxy_$PY_VERSION_SAFE_${{ github.run_number }}
           PYO_TEST_PROXY_PASSWORD: ${{ steps.create_database.outputs.database_password }}
-          PYO_TEST_ADMIN_USER: admin_${{ matrix.python-version }}_${{ github.run_number }}
+          PYO_TEST_ADMIN_USER: admin_$PY_VERSION_SAFE_${{ github.run_number }}
           PYO_TEST_ADMIN_PASSWORD: ${{ steps.create_database.outputs.database_password }}
-          PYO_TEST_EDITION_NAME: pythoneditions_${{ matrix.python-version }}_${{ github.run_number }}
+          PYO_TEST_EDITION_NAME: pythoneditions_$PY_VERSION_SAFE_${{ github.run_number }}
           TNS_ADMIN: /home/ubuntu
           LD_LIBRARY_PATH: ${{ env.LD_LIBRARY_PATH }}:/home/ubuntu
         run: |
           export PYO_TEST_CONNECT_STRING=`echo "${PYO_TEST_CONNECT_STRING:1:-1}"`
-          export PYO_TEST_MAIN_USER="${PYO_TEST_MAIN_USER//./_}"
-          export PYO_TEST_PROXY_USER="${PYO_TEST_PROXY_USER//./_}"
-          export PYO_TEST_ADMIN_USER="${PYO_TEST_ADMIN_USER//./_}"
           python -m pytest tests/create_schema.py
 #          python -m pytest
 #          python -m pytest tests/create_schema.py
