@@ -37,15 +37,15 @@ alter session set nls_numeric_characters='.,'
 alter session set time_zone='+00:00'
 /
 
-create user &main_user identified by &main_password
+create user "&main_user" identified by "&main_password"
 /
 
-create user &proxy_user identified by &proxy_password
+create user "&proxy_user" identified by "&proxy_password"
 /
-alter user &proxy_user grant connect through &main_user
+alter user "&proxy_user" grant connect through "&main_user"
 /
 
-grant create session to &proxy_user
+grant create session to "&proxy_user"
 /
 
 grant
@@ -56,12 +56,12 @@ grant
     create view,
     select any dictionary,
     change notification,
-    unlimited tablespace,
-    ctxapp
-to &main_user
+    unlimited tablespace
+    --, ctxapp
+to "&main_user"
 /
 
-grant aq_administrator_role to &main_user
+grant aq_administrator_role to "&main_user"
 /
 
 begin
@@ -71,7 +71,7 @@ begin
               from dba_roles
               where role in ('SODA_APP')
             ) loop
-        execute immediate 'grant ' || r.role || ' to &main_user';
+        execute immediate 'grant ' || r.role || ' to "&main_user"';
     end loop;
 
 end;
@@ -81,7 +81,7 @@ end;
 create edition &edition_name
 /
 
-grant use on edition &edition_name to &main_user
+grant use on edition &edition_name to "&main_user"
 /
 
 -- create types
