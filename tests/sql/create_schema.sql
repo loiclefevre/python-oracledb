@@ -54,7 +54,7 @@ grant
     , create procedure
     , create type
     , create view
-    , select any dictionary
+    --, select any dictionary
     --, change notification
     , unlimited tablespace
     --, ctxapp
