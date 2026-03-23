@@ -76,7 +76,7 @@ jobs:
           TNS_ADMIN: /home/ubuntu
           LD_LIBRARY_PATH: ${{ env.LD_LIBRARY_PATH }}:/home/ubuntu
         run: |
-        # remove enclosing double quotes
+          # remove enclosing double quotes
           export PYO_TEST_CONNECT_STRING=`echo "${PYO_TEST_CONNECT_STRING:1:-1}"`
           python -m pytest tests/create_schema.py
 #          python -m pytest
