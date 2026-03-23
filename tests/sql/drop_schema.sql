@@ -35,9 +35,9 @@ begin
     for r in
             ( select username
               from dba_users
-              where upper(username) in (upper('&main_user'), upper('&proxy_user'))
+              where username in (upper('&main_user'), upper('&proxy_user'))
             ) loop
-        execute immediate 'drop user "' || r.username || '" cascade';
+        execute immediate 'drop user ' || r.username || ' cascade';
     end loop;
 
     for r in
