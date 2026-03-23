@@ -70,6 +70,9 @@ jobs:
           LD_LIBRARY_PATH: ${{ env.LD_LIBRARY_PATH }}:/home/ubuntu
         run: |
           export PYO_TEST_CONNECT_STRING=`echo "${PYO_TEST_CONNECT_STRING:1:-1}"`
+          export PYO_TEST_MAIN_USER="${PYO_TEST_MAIN_USER//./_}"
+          export PYO_TEST_PROXY_USER="${PYO_TEST_PROXY_USER//./_}"
+          export PYO_TEST_ADMIN_USER="${PYO_TEST_ADMIN_USER//./_}"
           python -m pytest tests/create_schema.py
 #          python -m pytest
 #          python -m pytest tests/create_schema.py
